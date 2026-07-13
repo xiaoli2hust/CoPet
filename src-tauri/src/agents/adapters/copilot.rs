@@ -5,9 +5,11 @@ use std::{
 
 use serde_json::{json, Value};
 
+#[cfg(not(windows))]
+use super::super::HELPER_NAME;
 use super::super::{
     hook_command, read_json_object_optional, write_json_atomic, AdapterError, AgentManager,
-    CliAdapter, HELPER_NAME,
+    CliAdapter,
 };
 
 pub(super) static ADAPTER: CopilotCliAdapter = CopilotCliAdapter;
@@ -62,10 +64,10 @@ impl CliAdapter for CopilotCliAdapter {
     fn ensure_supported(&self) -> Result<(), AdapterError> {
         #[cfg(windows)]
         {
-            return Err(AdapterError::UnsupportedPlatform {
+            Err(AdapterError::UnsupportedPlatform {
                 display_name: self.display_name().to_string(),
                 platform: "Windows",
-            });
+            })
         }
 
         #[cfg(not(windows))]
@@ -145,6 +147,7 @@ fn copilot_hooks_file(adapter_id: &str, helper_path: &Path) -> Value {
     })
 }
 
+#[cfg(not(windows))]
 fn copilot_config_has_copet_hooks(
     path: &Path,
     adapter_id: &str,
@@ -172,6 +175,7 @@ fn copilot_config_has_copet_hooks(
     }))
 }
 
+#[cfg(not(windows))]
 fn hook_entry_matches_event(
     entry: &Value,
     adapter_id: &str,
@@ -188,6 +192,7 @@ fn hook_entry_matches_event(
             })
 }
 
+#[cfg(not(windows))]
 fn is_copilot_copet_command(
     command: &str,
     adapter_id: &str,
@@ -217,6 +222,7 @@ fn is_copilot_copet_command(
     )
 }
 
+#[cfg(not(windows))]
 fn parse_guard_path(segment: &str) -> Option<String> {
     let (path, rest) = parse_shell_quoted_word(segment)?;
     if rest.trim() == "]" {
@@ -226,6 +232,7 @@ fn parse_guard_path(segment: &str) -> Option<String> {
     }
 }
 
+#[cfg(not(windows))]
 fn invocation_matches_copet_helper(
     invocation: &str,
     adapter_id: &str,
@@ -253,6 +260,7 @@ fn invocation_matches_copet_helper(
     args.trim() == format!("{adapter_id} {kind}")
 }
 
+#[cfg(not(windows))]
 fn split_once_unquoted<'a>(input: &'a str, delimiter: &str) -> Option<(&'a str, &'a str)> {
     let mut in_single_quote = false;
     let mut escaped_outside_quote = false;
@@ -278,6 +286,7 @@ fn split_once_unquoted<'a>(input: &'a str, delimiter: &str) -> Option<(&'a str, 
     None
 }
 
+#[cfg(not(windows))]
 fn parse_shell_quoted_word(input: &str) -> Option<(String, &str)> {
     if !input.starts_with('\'') {
         return None;

@@ -1113,14 +1113,12 @@ pub fn run() {
     // pets — the pet sprite never renders, the startup animation never triggers,
     // and the window ends up as a tiny sliver.
     init_builtin_dirs_from_exe();
-    let mut builder = tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init());
 
     #[cfg(target_os = "macos")]
-    {
-        builder = builder.plugin(tauri_nspanel::init());
-    }
+    let builder = builder.plugin(tauri_nspanel::init());
 
     builder
         .setup(|app| {
