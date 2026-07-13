@@ -14,6 +14,15 @@ fn make_store(temp: &tempfile::TempDir) -> ConfigStore {
     ConfigStore::with_builtin_dir(temp.path().join(".copet"), builtin_pets_dir())
 }
 
+fn click_sound_path(storage_id: &str) -> String {
+    Path::new(storage_id)
+        .join("copet")
+        .join("sound")
+        .join("click.mp3")
+        .to_string_lossy()
+        .to_string()
+}
+
 #[test]
 fn removed_copet_pet_package_is_not_exposed_as_builtin_pet() {
     let temp = tempfile::tempdir().unwrap();
@@ -243,7 +252,7 @@ fn import_pet_folder_preserves_valid_sound_resources() {
         .click
         .as_ref()
         .unwrap()
-        .contains("folder-sound-pet/copet/sound/click.mp3"));
+        .contains(click_sound_path("folder-sound-pet").as_str()));
 }
 
 #[test]
@@ -275,7 +284,7 @@ fn import_pet_folder_from_relative_path_preserves_valid_sound_resources() {
         .click
         .as_ref()
         .unwrap()
-        .contains("relative-sound-pet/copet/sound/click.mp3"));
+        .contains(click_sound_path("relative-sound-pet").as_str()));
 }
 
 #[test]
@@ -305,7 +314,7 @@ fn import_pet_folder_from_installed_package_preserves_package() {
         .click
         .as_ref()
         .unwrap()
-        .contains("reimport-sound-pet/copet/sound/click.mp3"));
+        .contains(click_sound_path("reimport-sound-pet").as_str()));
 }
 
 #[test]
@@ -341,7 +350,7 @@ fn install_codex_pet_preserves_valid_sound_resources() {
         .click
         .as_ref()
         .unwrap()
-        .contains("codex-sound-pet/copet/sound/click.mp3"));
+        .contains(click_sound_path("codex-sound-pet").as_str()));
 }
 
 #[test]
