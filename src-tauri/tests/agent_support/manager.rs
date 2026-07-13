@@ -43,16 +43,30 @@ fn adapters_install_repair_and_uninstall_real_config_files() {
             let home = temp.path().join("home");
             let manager = manager_with_fake_agents(&root, &home);
 
-            for adapter_id in [
-                "codex",
-                "cursor",
-                "claude-code",
-                "antigravity",
-                "opencode",
-                "copilot",
-                "gemini",
-                "pi",
-            ] {
+            let adapter_ids: &[&str] = if cfg!(windows) {
+                &[
+                    "codex",
+                    "cursor",
+                    "claude-code",
+                    "antigravity",
+                    "opencode",
+                    "gemini",
+                    "pi",
+                ]
+            } else {
+                &[
+                    "codex",
+                    "cursor",
+                    "claude-code",
+                    "antigravity",
+                    "opencode",
+                    "copilot",
+                    "gemini",
+                    "pi",
+                ]
+            };
+
+            for adapter_id in adapter_ids.iter().copied() {
                 let installed = manager.install(adapter_id).unwrap();
                 assert!(installed.adapter.installed, "{adapter_id} should install");
                 assert!(
@@ -62,7 +76,7 @@ fn adapters_install_repair_and_uninstall_real_config_files() {
                     "{adapter_id} should write adapter metadata"
                 );
                 assert!(
-                    root.join("hooks/copet-hook.sh").exists(),
+                    root.join("hooks").join("copet-hook.sh").exists(),
                     "{adapter_id} should ensure the shared helper"
                 );
                 assert_adapter_config_contains_marker(adapter_id, &home, opencode_config_dir);
@@ -180,34 +194,54 @@ fn auto_install_detected_agents_installs_only_available_cli_adapters() {
         let temp = tempfile::tempdir().unwrap();
         let root = temp.path().join(".copet");
         let home = temp.path().join("home");
-        let manager = manager_with_fake_agent_names(
-            &root,
-            &home,
-            &["codex", "cursor", "agy", "copilot", "gemini", "pi"],
-        );
+        let agent_names: &[&str] = if cfg!(windows) {
+            &["codex", "cursor", "agy", "gemini", "pi"]
+        } else {
+            &["codex", "cursor", "agy", "copilot", "gemini", "pi"]
+        };
+        let manager = manager_with_fake_agent_names(&root, &home, agent_names);
 
         let summary = manager.auto_install_detected_agents();
 
-        assert_eq!(
-            summary.installed,
+        let expected_installed = if cfg!(windows) {
+            vec![
+                "codex".to_string(),
+                "antigravity".to_string(),
+                "cursor".to_string(),
+                "pi".to_string(),
+                "gemini".to_string(),
+            ]
+        } else {
             vec![
                 "codex".to_string(),
                 "antigravity".to_string(),
                 "cursor".to_string(),
                 "copilot".to_string(),
                 "pi".to_string(),
-                "gemini".to_string()
+                "gemini".to_string(),
             ]
-        );
-        assert_eq!(
-            summary.skipped,
+        };
+        let expected_skipped = if cfg!(windows) {
+            vec![
+                "claude-code".to_string(),
+                "opencode".to_string(),
+                "copilot".to_string(),
+            ]
+        } else {
             vec!["claude-code".to_string(), "opencode".to_string()]
-        );
+        };
+
+        assert_eq!(summary.installed, expected_installed);
+        assert_eq!(summary.skipped, expected_skipped);
         assert!(summary.failed.is_empty());
         assert!(home.join(".codex/hooks.json").exists());
         assert!(home.join(".cursor/hooks.json").exists());
         assert!(home.join(".gemini/config/hooks.json").exists());
-        assert!(home.join(".copilot/hooks/copet.json").exists());
+        if cfg!(windows) {
+            assert!(!home.join(".copilot/hooks/copet.json").exists());
+        } else {
+            assert!(home.join(".copilot/hooks/copet.json").exists());
+        }
         assert!(home.join(".gemini/settings.json").exists());
         assert!(home.join(".pi/agent/extensions/copet/index.ts").exists());
         assert!(!home.join(".claude/settings.json").exists());

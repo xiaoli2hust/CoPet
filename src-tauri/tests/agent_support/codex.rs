@@ -59,6 +59,7 @@ fn codex_install_omits_notification_event_unknown_to_codex() {
     }
 }
 
+#[cfg_attr(windows, ignore = "requires Unix shell helper execution")]
 #[test]
 fn codex_helper_bypasses_loopback_proxy_when_posting_runtime_events() {
     let _guard = PROXY_ENV_LOCK.lock().unwrap();
@@ -148,6 +149,7 @@ fn codex_helper_bypasses_loopback_proxy_when_posting_runtime_events() {
     assert!(request.contains(r#""kind":"tool.before""#));
 }
 
+#[cfg_attr(windows, ignore = "requires Unix shell helper execution")]
 #[test]
 fn codex_helper_outputs_schema_neutral_json_when_runtime_is_unavailable() {
     let temp = tempfile::tempdir().unwrap();
@@ -398,7 +400,7 @@ fn codex_install_writes_trusted_hashes_for_all_copet_hooks() {
     manager.install("codex").unwrap();
 
     let config = fs::read_to_string(home.join(".codex/config.toml")).unwrap();
-    let hooks_path = home.join(".codex/hooks.json");
+    let hooks_path = home.join(".codex").join("hooks.json");
     let hooks_abs = hooks_path.display().to_string();
     let sha_re = regex_lite_match_sha256;
 

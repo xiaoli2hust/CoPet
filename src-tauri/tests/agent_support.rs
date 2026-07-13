@@ -10,8 +10,23 @@ mod claude_code;
 #[path = "agent_support/codex.rs"]
 mod codex;
 
+#[cfg(not(windows))]
 #[path = "agent_support/copilot.rs"]
 mod copilot;
+
+#[cfg(windows)]
+#[test]
+fn copilot_adapter_reports_unsupported_on_windows() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join(".copet");
+    let home = temp.path().join("home");
+    let manager = helpers::manager_with_fake_agents(&root, &home);
+
+    let error = manager.install("copilot").unwrap_err();
+
+    assert!(error.to_string().contains("Windows"));
+    assert!(!root.join("adapters").join("copilot.json").exists());
+}
 
 #[path = "agent_support/cursor.rs"]
 mod cursor;

@@ -162,13 +162,15 @@ fn cursor_stale_helper_path_is_not_installed_and_install_repairs_it() {
     let serialized = hooks.to_string();
     assert!(serialized.contains(
         &current_root
-            .join("hooks/copet-hook.sh")
+            .join("hooks")
+            .join("copet-hook.sh")
             .to_string_lossy()
             .to_string()
     ));
     assert!(!serialized.contains(
         &stale_root
-            .join("hooks/copet-hook.sh")
+            .join("hooks")
+            .join("copet-hook.sh")
             .to_string_lossy()
             .to_string()
     ));
