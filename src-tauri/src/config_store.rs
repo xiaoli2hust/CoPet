@@ -1,8 +1,8 @@
 use crate::{
     app_state::{
         default_pet_window_size, normalize_pet_window_size, AgentMessageDisplay, AppState,
-        PetInteractionPrefs, PetWindowSize, DEFAULT_PET_WINDOW_SIZE, MAX_PET_WINDOW_SIZE,
-        MIN_PET_WINDOW_SIZE,
+        NianLunSettings, PetInteractionPrefs, PetWindowSize, DEFAULT_PET_WINDOW_SIZE,
+        MAX_PET_WINDOW_SIZE, MIN_PET_WINDOW_SIZE,
     },
     i18n::{default_locale, Locale, LocalePreference},
     pet_package::{
@@ -10,6 +10,7 @@ use crate::{
         PetManifest, PetNamespace, PetPackage, PetSummary,
     },
     pet_registry::{BUILTIN_PET_ID, BUILTIN_SOUND_PACK_ID, PRIORITY_BUILTIN_PET_IDS},
+    platform,
     sound_pack::{
         parse_runtime_sound_pack_id, scan_sound_packs_with_storage_ids, system_sound_pack_id,
         SoundPack, SoundPackNamespace, SoundPackSummary,
@@ -86,7 +87,7 @@ impl ConfigStore {
     pub fn from_home() -> Result<Self, StoreError> {
         let home = dirs::home_dir().ok_or(StoreError::MissingHome)?;
         Ok(Self {
-            root: home.join(".copet"),
+            root: platform::paths::config_root(&home),
             builtin_pets_dir: builtin_pets_dir(),
             builtin_sounds_dir: builtin_sounds_dir(),
         })
@@ -187,6 +188,9 @@ impl ConfigStore {
             agent_message_display: config.agent_message_display,
             agent_message_visible: config.agent_message_visible,
             pet_interactions: config.pet_interactions.clone(),
+            nianlun: config.nianlun.unwrap_or_default(),
+            nianlun_user_configured: config.nianlun_user_configured,
+            agent_integrations_enabled: config.agent_integrations_enabled,
         })
     }
 
@@ -341,6 +345,23 @@ impl ConfigStore {
         self.app_state()?;
         let mut config = self.load_or_create_config()?;
         config.pet_interactions = prefs;
+        self.save_config(&config)?;
+        self.app_state()
+    }
+
+    pub fn set_nianlun_settings(&self, settings: NianLunSettings) -> Result<AppState, StoreError> {
+        self.app_state()?;
+        let mut config = self.load_or_create_config()?;
+        config.nianlun = Some(settings);
+        config.nianlun_user_configured = true;
+        self.save_config(&config)?;
+        self.app_state()
+    }
+
+    pub fn set_agent_integrations_enabled(&self, enabled: bool) -> Result<AppState, StoreError> {
+        self.app_state()?;
+        let mut config = self.load_or_create_config()?;
+        config.agent_integrations_enabled = enabled;
         self.save_config(&config)?;
         self.app_state()
     }
@@ -916,6 +937,12 @@ fn sibling_work_dir(target_dir: &Path, suffix: &str) -> Result<PathBuf, StoreErr
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StoredConfig {
+    #[serde(default)]
+    nianlun: Option<NianLunSettings>,
+    #[serde(default)]
+    nianlun_user_configured: bool,
+    #[serde(default)]
+    agent_integrations_enabled: bool,
     current_pet_id: String,
     #[serde(default = "default_current_sound_pack_id")]
     current_sound_pack_id: String,
@@ -944,6 +971,9 @@ struct StoredConfig {
 impl Default for StoredConfig {
     fn default() -> Self {
         Self {
+            nianlun: None,
+            nianlun_user_configured: false,
+            agent_integrations_enabled: false,
             current_pet_id: system_pet_id(BUILTIN_PET_ID),
             current_sound_pack_id: default_current_sound_pack_id(),
             onboarding_complete: false,

@@ -72,6 +72,43 @@ impl Default for PetInteractionPrefs {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct NianLunSettings {
+    pub base_url: String,
+    pub chat_path: String,
+    pub health_path: String,
+    pub stream_enabled: bool,
+    pub timeout_ms: u64,
+    pub mock_enabled: bool,
+    pub history_enabled: bool,
+}
+
+impl Default for NianLunSettings {
+    fn default() -> Self {
+        Self {
+            base_url: "http://localhost:8000".to_string(),
+            chat_path: "/api/agent/chat".to_string(),
+            health_path: "/api/health".to_string(),
+            stream_enabled: true,
+            timeout_ms: 30_000,
+            mock_enabled: true,
+            history_enabled: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NianLunPetStatus {
+    Idle,
+    Listening,
+    Thinking,
+    Working,
+    Success,
+    Error,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AppState {
     pub current_pet_id: String,
     pub current_sound_pack_id: String,
@@ -86,4 +123,10 @@ pub struct AppState {
     pub agent_message_visible: bool,
     #[serde(default)]
     pub pet_interactions: PetInteractionPrefs,
+    #[serde(default)]
+    pub nianlun: NianLunSettings,
+    #[serde(default)]
+    pub nianlun_user_configured: bool,
+    #[serde(default)]
+    pub agent_integrations_enabled: bool,
 }

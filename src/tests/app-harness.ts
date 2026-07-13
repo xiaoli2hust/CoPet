@@ -307,6 +307,17 @@ export async function createAppHarness(browser: Browser, options: AppHarnessOpti
     petWindowSize: 40,
     agentMessageDisplay: "all",
     agentMessageVisible: true,
+    agentIntegrationsEnabled: true,
+    nianlunUserConfigured: true,
+    nianlun: {
+      baseUrl: "http://localhost:8000",
+      chatPath: "/api/agent/chat",
+      healthPath: "/api/health",
+      streamEnabled: true,
+      timeoutMs: 30_000,
+      mockEnabled: true,
+      historyEnabled: true,
+    },
   };
   if (state.soundPacks === undefined) {
     state = { ...state, soundPacks: [copetSoundPack] };

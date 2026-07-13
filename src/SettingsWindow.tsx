@@ -1,6 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { Info, PawPrint, Plug, Settings2 } from "lucide-react";
+import { Info, MessageCircle, PawPrint, Plug, Settings2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { SettingsAgentsSection } from "./components/SettingsAgentsSection";
 import { SettingsNav } from "./components/SettingsNav";
 import { SettingsTipBox } from "./components/SettingsTipBox";
 import { SettingsPetsSection } from "./components/SettingsPetsSection";
+import { SettingsNianLunSection } from "./components/SettingsNianLunSection";
 import { SettingsPreferencesSection } from "./components/SettingsPreferencesSection";
 import { SettingsSectionHost } from "./components/SettingsSectionHost";
 import type {
@@ -46,6 +47,7 @@ const SETTINGS_PANEL_ID = "settings-section-panel";
 const NAV_ITEMS: SettingsNavItem[] = [
   { id: "pets", icon: PawPrint, labelKey: "navPets" },
   { id: "agents", icon: Plug, labelKey: "navAgents" },
+  { id: "nianlun", icon: MessageCircle, labelKey: "navNianLun" },
   { id: "preferences", icon: Settings2, labelKey: "navPreferences" },
   { id: "about", icon: Info, labelKey: "navAbout" },
 ];
@@ -257,7 +259,7 @@ export function SettingsWindow() {
               draggable={false}
               src={copetLogoUrl}
             />
-            <span className="settings-brand-name">CoPet</span>
+            <span className="settings-brand-name">NianLun Desktop Pet</span>
           </div>
           <SettingsNav
             active={activeSection}
@@ -306,6 +308,13 @@ export function SettingsWindow() {
               adapters={adapters}
               runAdapterAction={runAdapterAction}
               t={t}
+            />
+          )}
+          {activeSection === "nianlun" && (
+            <SettingsNianLunSection
+              locale={appState.locale}
+              settings={appState.nianlun}
+              userConfigured={appState.nianlunUserConfigured}
             />
           )}
           {activeSection === "preferences" && (

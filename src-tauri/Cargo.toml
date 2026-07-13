@@ -20,6 +20,7 @@ path = "src/main.rs"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+keyring = "3"
 dirs = "5"
 getrandom = "0.2"
 serde = { version = "1", features = ["derive"] }

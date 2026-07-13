@@ -1,14 +1,18 @@
 {
-  "name": "copet",
+  "name": "nianlun-desktop-pet",
   "version": "0.1.9",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
     "icons:create": "node scripts/create-icons.mjs",
     "test:frontend": "playwright test -c playwright.config.ts",
     "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml",
+    "mock:nianlun": "node examples/mock-nianlun-server/server.mjs",
     "verify:hardening": "pnpm build && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tauri build --bundles app",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
@@ -27,12 +31,15 @@
     "sonner": "^2.0.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@playwright/test": "^1.60.0",
     "@tauri-apps/cli": "^2.11.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "dotenv-cli": "^11.0.0",
+    "eslint": "^9.0.0",
+    "typescript-eslint": "^8.0.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"
   },

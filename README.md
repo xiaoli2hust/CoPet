@@ -1,152 +1,198 @@
-<div align="center">
-  <img src="./public/pet.png" alt="CoPet logo" width="120" />
-  <h1>CoPet</h1>
-  <p><strong>A living desktop companion for every AI Agent.</strong></p>
-  <p>Powered by Codex-compatible pet packages, CoPet reacts in real time to Claude Code, Codex, Antigravity, OpenCode, Cursor, Copilot CLI, Pi, and Gemini, turning prompts, tool use, waiting, and completions into lively pet reactions on your desktop.</p>
-</div>
+# NianLun Desktop Pet
 
-![CoPet](./public/banner.png)
+NianLun Desktop Pet (年轮经营桌宠) is a cross-platform business Q&A desktop pet built directly on [CoPet](https://github.com/ChanceYu/CoPet). It remains an interactive always-on-top pet, while a double-click opens a compact desktop Q&A window for the NianLun business agent.
 
-[简体中文](./README.zh.md)
+The same React and Tauri codebase supports macOS (Apple Silicon first, Intel-compatible source/build configuration) and Windows 10/11 x64. There is no duplicated business implementation per operating system.
 
-Built with Tauri, Rust, and React. Lightweight, local-first, no cloud.
+[中文说明](README.zh.md) | [Agent integration protocol](docs/nianlun-agent-integration.md) | [V1 checklist](docs/nianlun-v1-checklist.md)
 
-## Built-in pets
+## What is retained from CoPet
 
-<table>
-  <tr>
-    <td align="center"><img src="./public/pets/copet-neo.gif" width="96" alt="CoPet Neo"><br><sub>CoPet Neo</sub></td>
-    <td align="center"><img src="./public/pets/copet-nia.gif" width="96" alt="CoPet Nia"><br><sub>CoPet Nia</sub></td>
-    <td align="center"><img src="./public/pets/copet-mecha.gif" width="96" alt="CoPet Mecha"><br><sub>CoPet Mecha</sub></td>
-    <td align="center"><img src="./public/pets/dj-fuzz.gif" width="96" alt="DJ Fuzz"><br><sub>DJ Fuzz</sub></td>
-    <td align="center"><img src="./public/pets/dog.gif" width="96" alt="Lucky Dog"><br><sub>Lucky Dog</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="./public/pets/dragon.gif" width="96" alt="Azure Dragon"><br><sub>Azure Dragon</sub></td>
-    <td align="center"><img src="./public/pets/duck.gif" width="96" alt="Waddly Duck"><br><sub>Waddly Duck</sub></td>
-    <td align="center"><img src="./public/pets/goat.gif" width="96" alt="Cloud Goat"><br><sub>Cloud Goat</sub></td>
-    <td align="center"><img src="./public/pets/goku.gif" width="96" alt="Goku"><br><sub>Goku</sub></td>
-    <td align="center"><img src="./public/pets/horse.gif" width="96" alt="Chestnut Horse"><br><sub>Chestnut Horse</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="./public/pets/monkey.gif" width="96" alt="Clever Monkey"><br><sub>Clever Monkey</sub></td>
-    <td align="center"><img src="./public/pets/orange-cat.gif" width="96" alt="Orange Cat"><br><sub>Orange Cat</sub></td>
-    <td align="center"><img src="./public/pets/ox.gif" width="96" alt="Cream Ox"><br><sub>Cream Ox</sub></td>
-    <td align="center"><img src="./public/pets/panda.gif" width="96" alt="Panda"><br><sub>Panda</sub></td>
-    <td align="center"><img src="./public/pets/pig.gif" width="96" alt="Blush Pig"><br><sub>Blush Pig</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="./public/pets/rabbit.gif" width="96" alt="White Rabbit"><br><sub>White Rabbit</sub></td>
-    <td align="center"><img src="./public/pets/rat.gif" width="96" alt="Pearl Rat"><br><sub>Pearl Rat</sub></td>
-    <td align="center"><img src="./public/pets/rooster.gif" width="96" alt="Golden Rooster"><br><sub>Golden Rooster</sub></td>
-    <td align="center"><img src="./public/pets/snake.gif" width="96" alt="Jade Snake"><br><sub>Jade Snake</sub></td>
-    <td align="center"><img src="./public/pets/tiger.gif" width="96" alt="Striped Tiger"><br><sub>Striped Tiger</sub></td>
-  </tr>
-</table>
+- Transparent, borderless desktop pet window and existing pet assets.
+- Pet selection, sprite animation, click reactions, dragging, and always-on-top behavior.
+- Native context menu, system tray, settings center, local configuration, error handling, and Windows bundling.
+- Existing optional Codex, Claude Code, Cursor, and related Agent Hooks. They are not removed, but automatic installation and runtime display are disabled by default for this product.
 
-## Features
+## NianLun V1
 
-- Real-time pet reactions to Agent prompts, tool use, waiting, completion, and errors.
-- Integrations for Claude Code, Codex, Antigravity, OpenCode, Cursor, Copilot CLI, Pi, and Gemini.
-- Built-in pets plus import support for Codex-compatible pet packages.
-- Rich pet interactions: hover, click, double-click, rapid-click petting, long-press, drag reactions, and native context menu.
-- Global and per-pet sound packs for interactions and Agent states.
-- Settings and tray controls for pet size, pet launch animation on app startup, Agent message display mode, hooks, sounds, language, visibility, and window position.
-- Agent messages can show only the latest update or keep multiple Agent updates visible at once.
-- Local-first data model in `~/.copet`, with safe hook backups, atomic writes, and no telemetry.
+- Single-click keeps the ordinary pet interaction; double-click opens `问年轮` beside the pet.
+- Independent translucent `420 x 560` Q&A window, resizable and clamped to the active monitor.
+- Enter to send, Shift+Enter for a new line, stop, retry, copy, clear, collapse, auto-scroll, and continuing questions.
+- Safe basic Markdown rendering with constrained links, scrollable code blocks/tables, and no raw HTML injection.
+- Built-in Mock Adapter and a separately runnable Mock HTTP/SSE server.
+- Ordinary HTTP and SSE, automatic stream-to-HTTP fallback, timeout, cancellation, malformed response handling, and offline errors.
+- Local conversation history, limited to the latest 10 conversations and resilient to corrupted storage.
+- Access tokens stored in macOS Keychain or Windows Credential Manager through the Rust platform layer, never in conversation history or the normal config file.
 
-## Installation
-
-| Platform | Download |
-| --- | --- |
-| macOS (Universal) | [CoPet-macos-universal.dmg](https://github.com/ChanceYu/CoPet/releases/latest/download/CoPet-macos-universal.dmg) |
-| Windows x64 | [CoPet-windows-x64.exe](https://github.com/ChanceYu/CoPet/releases/latest/download/CoPet-windows-x64.exe) |
-
-[All releases](https://github.com/ChanceYu/CoPet/releases)
-
-### macOS
-
-Drag `CoPet.app` into `/Applications`. The build is not notarized, so run once to clear the quarantine flag:
-
-```bash
-sudo xattr -rd com.apple.quarantine /Applications/CoPet.app
-```
-
-### Windows
-
-Windows builds are not code-signed. SmartScreen may warn on first launch — click *More info* → *Run anyway*.
-
-## Customize your pet
-
-CoPet is not limited to built-in pets. The [CoPet Skill series](./skills/README.md) helps you turn a character idea, team mascot, or personal avatar into your own desktop companion:
-
-- [`copet-gen`](./skills/copet-gen/SKILL.md) generates and installs custom CoPet pet packages with `pet.json` and `spritesheet.webp`, so your own pet can react to Agent activity.
-- [`copet-sound`](./skills/copet-sound/SKILL.md) creates matching 11-clip MP3 sound packs for clicks, gestures, waiting, success, and error states.
-
-Install CoPet Skills into Codex with either method.
-
-From a terminal:
-
-```bash
-npx skills add ChanceYu/CoPet --skill '*' -a codex
-```
-
-Inside Codex:
+## Shared architecture
 
 ```text
-$skill-installer install all CoPet skills from https://github.com/ChanceYu/CoPet/tree/main/skills
+src/
+  NianLunWindow.tsx                shared React Q&A window
+  services/nianlun/                config, adapters, normalizer, errors, sessions
+  platform/                        thin frontend platform facade
+src-tauri/src/
+  platform/                        credentials, paths, window placement, lifecycle
+  window_placement.rs              retained CoPet pet-window/DPI behavior
+examples/mock-nianlun-server/      standalone HTTP/SSE compatibility server
+.github/workflows/build-desktop.yml
 ```
 
-Restart Codex if the newly installed Skills do not appear.
+All Q&A, session, pet feedback, and configuration logic is shared. Platform-specific code is intentionally limited to system integration.
 
-> **Codex only.** `copet-gen` delegates pet generation to the upstream `$hatch-pet` / `$imagegen` chain, which depends on Codex's built-in `image_gen` tool. Claude Code, Cursor, and other agents do not ship this tool, so the Skill is not supported there.
+## Security boundary
 
-## Supported agents
+Requests declare `super_readonly`, but this client value is not an authorization boundary. The NianLun server must authenticate the caller, enforce read-only access and data scope, validate every tool action, and reject SQL or write operations. V1 is intended for a trusted test environment.
 
-| Agent | Integration | Default config path |
-| --- | --- | --- |
-| Claude Code | JSON hooks | `~/.claude/settings.json` |
-| Codex | JSON hooks + trusted hook hashes | `~/.codex/hooks.json`, `~/.codex/config.toml` |
-| Antigravity | JSON hooks | `~/.gemini/config/hooks.json` |
-| OpenCode | JS plugin + config entry | `~/.config/opencode/plugins/copet.js`, `~/.config/opencode/opencode.json` |
-| Cursor | JSON hooks | `~/.cursor/hooks.json` |
-| Copilot CLI | JSON hook file | `~/.copilot/hooks/copet.json` |
-| Pi | TypeScript extension | `~/.pi/agent/extensions/copet/index.ts` |
-| Gemini | JSON hooks | `~/.gemini/settings.json` |
+Never commit a real token, private URL, certificate, or internal host. Tokens are omitted from logs, errors, screenshots, config JSON, and local history.
 
-## Getting started
+## Configuration
 
-Prerequisites: [Rust](https://www.rust-lang.org/tools/install), [Node.js](https://nodejs.org/) with pnpm. Runs on macOS (primary), Windows, and Linux.
+Copy `.env.example` only when environment defaults are useful. User settings in the Settings Center take precedence over environment variables, which take precedence over development defaults.
+
+```dotenv
+NIANLUN_AGENT_BASE_URL=http://localhost:8000
+NIANLUN_AGENT_CHAT_PATH=/api/agent/chat
+NIANLUN_AGENT_HEALTH_PATH=/api/health
+```
+
+Open **Settings > NianLun Connection** to configure the URL, paths, streaming, timeout, built-in Mock mode, history, and optional access token. Production endpoints are not hard-coded.
+
+## macOS
+
+### Prerequisites
+
+- macOS on Apple Silicon or Intel.
+- Xcode Command Line Tools: `xcode-select --install`.
+- Node.js 22, pnpm 10.28, and the stable Rust toolchain.
+- WebKit is provided by macOS.
 
 ```bash
-git clone https://github.com/ChanceYu/CoPet.git
-cd CoPet
+corepack enable
+corepack prepare pnpm@10.28.0 --activate
+rustup toolchain install stable
 pnpm install
-pnpm tauri:dev          # development
-pnpm tauri:build        # production bundle
+pnpm exec playwright install chromium
 ```
 
-## Project layout
+### Development
 
-- `src-tauri/` — Rust core, agent adapters, runtime server.
-- `src/` — React frontend (pet window + settings center).
-- `src-tauri/assets/pets/` — built-in pet packages bundled with the app.
-- `src-tauri/assets/sounds/` — built-in global sound packs bundled with the app.
-- `skills/` — optional CoPet Skill docs for generating pets and 11-clip sound packs.
-- `docs/architecture.md` — technical architecture and design.
-- `AGENTS.md` — contributor guide and testing instructions.
+```bash
+pnpm tauri:dev
+```
 
-## Security
+To exercise the real HTTP path instead of the built-in adapter:
 
-- Event server binds only to `127.0.0.1`, requires a bearer token, rate-limits requests, and drops unknown payloads.
-- All hook config changes are backed up before write and use atomic file ops.
-- Pet and sound packages are treated as untrusted data and validated before use.
-- `assetProtocol.scope` whitelists exactly which pet, sound, preview, and bundled resource directories the webview can read.
+```bash
+pnpm mock:nianlun
+```
 
-## Contributing
+Then disable built-in Mock mode in Settings and test `http://localhost:8000`.
 
-Issues and PRs welcome. Start with [AGENTS.md](AGENTS.md) for setup and conventions, and [docs/architecture.md](docs/architecture.md) for the system design.
+### Tests
 
-## License
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features -- -D warnings
+cargo test --manifest-path src-tauri/Cargo.toml
+```
 
-[MIT](LICENSE) © ChanceYu
+### Production build
+
+```bash
+pnpm tauri:build
+```
+
+The DMG is generated below `src-tauri/target/release/bundle/dmg/`; the `.app` is below `src-tauri/target/release/bundle/macos/`.
+
+### Installing an unsigned test build
+
+Open the DMG and drag the app to Applications. An unsigned first build may show a macOS security warning. In a trusted test environment, right-click the app and choose **Open**, or use **System Settings > Privacy & Security > Open Anyway** after reviewing the source and artifact. Formal releases require Developer ID signing, hardened runtime entitlements, and Apple notarization.
+
+### macOS troubleshooting
+
+- Blank pet: confirm bundled assets exist and restart `pnpm tauri:dev`.
+- Agent appears offline: enable built-in Mock mode or start `pnpm mock:nianlun`, then use **Test Connection**.
+- Token cannot be saved: unlock the login Keychain and retry.
+- Intel delivery: build on an Intel runner or add an x86_64 target and produce a universal binary before release.
+
+## Windows 10/11 x64
+
+### Prerequisites
+
+- Windows 10 or Windows 11 x64 with current WebView2 Runtime.
+- Visual Studio 2022 Build Tools with **Desktop development with C++** and Windows SDK.
+- Node.js 22, pnpm 10.28, and stable Rust MSVC (`x86_64-pc-windows-msvc`).
+
+```powershell
+corepack enable
+corepack prepare pnpm@10.28.0 --activate
+rustup default stable-msvc
+rustup target add x86_64-pc-windows-msvc
+pnpm install
+pnpm exec playwright install chromium
+```
+
+### Development
+
+```powershell
+pnpm tauri:dev
+```
+
+### Tests
+
+```powershell
+pnpm typecheck
+pnpm lint
+pnpm test:frontend
+cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features -- -D warnings
+cargo test --manifest-path src-tauri/Cargo.toml
+```
+
+### Production build
+
+```powershell
+pnpm tauri:build
+```
+
+The NSIS installer is generated below `src-tauri\target\release\bundle\nsis\`. Tauri may also generate MSI output when that target is enabled.
+
+### Installing an unsigned test build
+
+Run the generated installer. Windows SmartScreen can warn about an unsigned first build. In a trusted test environment, verify the artifact source, select **More info**, then **Run anyway**. Formal releases require an Authenticode code-signing certificate (preferably EV for reputation), timestamping, and protected CI signing secrets.
+
+### Windows troubleshooting
+
+- Blank or missing window: install/update Microsoft Edge WebView2 Runtime.
+- Build-link errors: add the MSVC C++ workload and Windows SDK, then open a new terminal.
+- Blurry UI at 125%/150% DPI: keep Windows per-monitor scaling enabled and report monitor layout/DPI with the CI version.
+- Process remains after exit: use the tray **Exit** action; do not only hide the pet.
+- SmartScreen warning: expected only for unsigned test artifacts; production builds must be signed.
+
+## Standalone Mock server
+
+```bash
+pnpm mock:nianlun
+```
+
+Endpoints:
+
+- `GET http://localhost:8000/api/health`
+- `POST http://localhost:8000/api/agent/chat`
+- Add `Accept: text/event-stream` to exercise SSE.
+
+It returns clearly marked simulated business data for the five V1 questions and same-conversation follow-ups. It never connects to a database.
+
+## GitHub Actions
+
+`.github/workflows/build-desktop.yml` contains real macOS and Windows x64 jobs. Each job installs Node, pnpm and Rust, runs type checking, lint/front-end tests, Rust fmt/clippy/tests, performs a Tauri production build, and uploads DMG/app or NSIS/MSI artifacts.
+
+Unsigned artifacts are accepted for the first test release. For a formal release, add protected signing secrets and Tauri signing configuration; never place certificates or passwords in the repository.
+
+## License and upstream
+
+This repository is a derivative of CoPet and retains its existing license and attribution. Pet assets and CoPet internals remain subject to the upstream repository's terms.

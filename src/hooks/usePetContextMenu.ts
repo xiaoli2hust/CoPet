@@ -5,12 +5,23 @@ import { useCallback, useEffect, useRef } from "react";
 const PET_CONTEXT_MENU_ACTION_EVENT = "copet-pet-context-menu-action";
 
 export type PetContextMenuLabels = {
+  askNianLun: string;
+  openChat: string;
   messages: string;
   openSettings: string;
+  changePet: string;
   hidePet: string;
+  quit: string;
 };
 
-export type PetContextMenuAction = "toggleMessages" | "openSettings" | "hidePet";
+export type PetContextMenuAction =
+  | "askNianLun"
+  | "openChat"
+  | "toggleMessages"
+  | "openSettings"
+  | "changePet"
+  | "hidePet"
+  | "quit";
 
 const NATIVE_MENU_VERTICAL_GAP_PX = 4;
 const NATIVE_MENU_MIN_WIDTH_PX = 148;
@@ -19,17 +30,25 @@ const NATIVE_MENU_AVERAGE_CHAR_WIDTH_PX = 7;
 
 type UsePetContextMenuOptions = {
   labels: PetContextMenuLabels;
+  onAskNianLun: () => void | Promise<void>;
+  onOpenChat: () => void | Promise<void>;
   onToggleMessages: () => void | Promise<void>;
   onOpenSettings: () => void | Promise<void>;
+  onChangePet: () => void | Promise<void>;
   onHidePet: () => void | Promise<void>;
+  onQuit: () => void | Promise<void>;
   onPopupFailed: () => void;
 };
 
 function estimateNativeMenuWidth(labels: PetContextMenuLabels) {
   const longestLabelLength = Math.max(
+    labels.askNianLun.length,
+    labels.openChat.length,
     labels.messages.length,
     labels.openSettings.length,
+    labels.changePet.length,
     labels.hidePet.length,
+    labels.quit.length,
   );
   return Math.max(
     NATIVE_MENU_MIN_WIDTH_PX,
@@ -80,12 +99,20 @@ export function usePetContextMenu(options: UsePetContextMenuOptions) {
     void getCurrentWebviewWindow()
       .listen<PetContextMenuAction>(PET_CONTEXT_MENU_ACTION_EVENT, async (event) => {
         const current = optionsRef.current;
-        if (event.payload === "toggleMessages") {
+        if (event.payload === "askNianLun") {
+          await current.onAskNianLun();
+        } else if (event.payload === "openChat") {
+          await current.onOpenChat();
+        } else if (event.payload === "toggleMessages") {
           await current.onToggleMessages();
         } else if (event.payload === "openSettings") {
           await current.onOpenSettings();
+        } else if (event.payload === "changePet") {
+          await current.onChangePet();
         } else if (event.payload === "hidePet") {
           await current.onHidePet();
+        } else if (event.payload === "quit") {
+          await current.onQuit();
         }
       })
       .then((cleanup) => {

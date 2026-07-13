@@ -19,6 +19,8 @@ import type {
   PetWindowSize,
   RuntimeStatus,
 } from "./appTypes";
+import type { NianLunPetStatus } from "./appTypes";
+import type { NianLunConfig } from "../services/nianlun/types";
 
 export type CommandResult = { errorMessage: string | null };
 
@@ -110,6 +112,76 @@ export async function setPetWindowSize(
 export async function openSettingsWindow(): Promise<CommandResult> {
   try {
     await invoke("open_settings_window");
+    return { errorMessage: null };
+  } catch (error) {
+    return { errorMessage: toMessage(error) };
+  }
+}
+
+export async function openSettingsSection(
+  section: "pets" | "agents" | "nianlun" | "preferences" | "about",
+): Promise<CommandResult> {
+  try {
+    await invoke("open_settings_section", { section });
+    return { errorMessage: null };
+  } catch (error) {
+    return { errorMessage: toMessage(error) };
+  }
+}
+
+export async function openNianLunWindow(): Promise<CommandResult> {
+  try {
+    await invoke("open_nianlun_window");
+    return { errorMessage: null };
+  } catch (error) {
+    return { errorMessage: toMessage(error) };
+  }
+}
+
+export async function setNianLunSettings(
+  settings: NianLunConfig,
+): Promise<CommandResult> {
+  try {
+    const next = await invoke<AppState>("set_nianlun_settings", { settings });
+    patchAppState(next);
+    return { errorMessage: null };
+  } catch (error) {
+    return { errorMessage: toMessage(error) };
+  }
+}
+
+export async function getNianLunAccessToken(): Promise<string> {
+  try {
+    return (await invoke<string | null>("get_nianlun_access_token")) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export async function saveNianLunAccessToken(
+  token: string,
+): Promise<CommandResult> {
+  try {
+    await invoke("set_nianlun_access_token", { token });
+    return { errorMessage: null };
+  } catch {
+    return { errorMessage: "无法保存访问 Token 到系统安全存储" };
+  }
+}
+
+export async function setNianLunPetStatus(
+  status: NianLunPetStatus,
+): Promise<void> {
+  try {
+    await invoke("set_nianlun_pet_status", { status });
+  } catch {
+    // Pet feedback is best effort and must never break a chat request.
+  }
+}
+
+export async function quitApp(): Promise<CommandResult> {
+  try {
+    await invoke("quit_app");
     return { errorMessage: null };
   } catch (error) {
     return { errorMessage: toMessage(error) };

@@ -32,6 +32,7 @@ export type UseLayeredPetStateResult = {
 
 export function useLayeredPetState(opts?: {
   onLongPress?: (origin: { x: number; y: number }) => void;
+  onDoubleClick?: () => void;
   onInteractionSound?: (kind: InteractionSoundKey) => void;
 }): UseLayeredPetStateResult {
   const petState = usePetState();
@@ -43,6 +44,7 @@ export function useLayeredPetState(opts?: {
   const agent = useAgentState({ petState, agentMessages });
   const interaction = useInteractionState({
     onLongPress: opts?.onLongPress,
+    onDoubleClick: opts?.onDoubleClick,
     onInteractionSound: opts?.onInteractionSound,
     cooldownStyle,
   });

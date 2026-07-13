@@ -56,14 +56,19 @@ export type UseInteractionStateResult = {
 
 export function useInteractionState(opts?: {
   onLongPress?: (origin: { x: number; y: number }) => void;
+  onDoubleClick?: () => void;
   onInteractionSound?: (kind: InteractionSoundKey) => void;
   cooldownStyle?: CooldownStyle;
 }): UseInteractionStateResult {
   const onLongPressRef = useRef(opts?.onLongPress);
+  const onDoubleClickRef = useRef(opts?.onDoubleClick);
   const onInteractionSoundRef = useRef(opts?.onInteractionSound);
   useEffect(() => {
     onLongPressRef.current = opts?.onLongPress;
   }, [opts?.onLongPress]);
+  useEffect(() => {
+    onDoubleClickRef.current = opts?.onDoubleClick;
+  }, [opts?.onDoubleClick]);
   useEffect(() => {
     onInteractionSoundRef.current = opts?.onInteractionSound;
   }, [opts?.onInteractionSound]);
@@ -221,6 +226,7 @@ export function useInteractionState(opts?: {
         bumpCounter("doubleClick");
         emitInteractionSound("doubleClick");
         triggerSurprised();
+        onDoubleClickRef.current?.();
         return;
       }
 
@@ -276,6 +282,7 @@ export function useInteractionState(opts?: {
       bumpCounter("doubleClick");
       emitInteractionSound("doubleClick");
       triggerSurprised();
+      onDoubleClickRef.current?.();
     },
     [emitInteractionSound, isCoolingDown, startCooldown, triggerSurprised],
   );

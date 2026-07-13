@@ -141,8 +141,8 @@ mod subject {
         let pet_window_config = config
             .split("\"label\": \"pet\"")
             .nth(1)
-            .and_then(|rest| rest.split("\"label\": \"settings\"").next())
-            .expect("pet window config should be present before settings window config");
+            .and_then(|rest| rest.split("\"label\": \"nianlun\"").next())
+            .expect("pet window config should be present before nianlun window config");
 
         assert!(pet_window_config.contains("\"focusable\": false"));
     }
@@ -153,8 +153,8 @@ mod subject {
         let pet_window_config = config
             .split("\"label\": \"pet\"")
             .nth(1)
-            .and_then(|rest| rest.split("\"label\": \"settings\"").next())
-            .expect("pet window config should be present before settings window config");
+            .and_then(|rest| rest.split("\"label\": \"nianlun\"").next())
+            .expect("pet window config should be present before nianlun window config");
 
         assert!(!pet_window_config.contains("\"alwaysOnTop\": true"));
     }
@@ -333,7 +333,7 @@ mod subject {
             .nth(1)
             .expect("settings window config should be present");
 
-        assert!(settings_window_config.contains("\"title\": \"CoPet\""));
+        assert!(settings_window_config.contains("\"title\": \"年轮经营桌宠\""));
         assert!(!settings_window_config.contains("\"title\": \"CoPet Settings\""));
     }
 
@@ -348,7 +348,7 @@ mod subject {
         let settings_branch = close_requested_handler
             .split("\"settings\" => {")
             .nth(1)
-            .and_then(|rest| rest.split("\"pet\" => {").next())
+            .and_then(|rest| rest.split("\"nianlun\" => {").next())
             .expect("settings close branch should exist");
 
         assert!(settings_branch.contains("window.destroy()"));
