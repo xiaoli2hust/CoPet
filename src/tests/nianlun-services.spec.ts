@@ -38,10 +38,10 @@ const defaultConfig: NianLunConfig = {
   baseUrl: "http://localhost:8000",
   chatPath: "/api/agent/chat",
   healthPath: "/api/health",
-  streamEnabled: true,
+  enableStreaming: true,
   timeoutMs: 1_000,
-  mockEnabled: false,
-  historyEnabled: true,
+  mockMode: false,
+  saveHistory: true,
 };
 
 test("NianLun URL settings prefer user values and normalize slashes", () => {

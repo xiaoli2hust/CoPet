@@ -313,10 +313,10 @@ export async function createAppHarness(browser: Browser, options: AppHarnessOpti
       baseUrl: "http://localhost:8000",
       chatPath: "/api/agent/chat",
       healthPath: "/api/health",
-      streamEnabled: true,
+      enableStreaming: true,
       timeoutMs: 30_000,
-      mockEnabled: true,
-      historyEnabled: true,
+      mockMode: true,
+      saveHistory: true,
     },
   };
   if (state.soundPacks === undefined) {
@@ -668,6 +668,21 @@ export async function createAppHarness(browser: Browser, options: AppHarnessOpti
           state = { ...state, petInteractions: args.prefs as PetInteractionPrefs };
           await emitAppState();
           return state;
+        }
+        if (command === "set_nianlun_settings") {
+          state = {
+            ...state,
+            nianlun: args.settings as AppState["nianlun"],
+            nianlunUserConfigured: true,
+          };
+          await emitAppState();
+          return state;
+        }
+        if (command === "get_nianlun_access_token") {
+          return "";
+        }
+        if (command === "save_nianlun_access_token") {
+          return null;
         }
         if (command === "set_locale_preference") {
           const localePreference = args.localePreference as AppState["localePreference"];

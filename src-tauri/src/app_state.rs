@@ -76,9 +76,12 @@ pub struct NianLunSettings {
     pub base_url: String,
     pub chat_path: String,
     pub health_path: String,
+    #[serde(rename = "enableStreaming", alias = "streamEnabled")]
     pub stream_enabled: bool,
     pub timeout_ms: u64,
+    #[serde(rename = "mockMode", alias = "mockEnabled")]
     pub mock_enabled: bool,
+    #[serde(rename = "saveHistory", alias = "historyEnabled")]
     pub history_enabled: bool,
 }
 

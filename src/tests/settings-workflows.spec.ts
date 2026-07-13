@@ -13,6 +13,40 @@ import {
 } from "./app-harness";
 import type { PetSummary } from "./app-harness";
 
+test("NianLun settings save uses the shared frontend configuration contract", async ({
+  browser,
+}) => {
+  const harness = await createAppHarness(browser);
+  const page = await harness.openPage("settings");
+
+  await page.getByRole("tab", { name: /NianLun|年轮连接/ }).click();
+  await page.getByRole("button", { name: /Save|保存设置/ }).click();
+
+  await expect(page.getByText(/NianLun connection saved|年轮连接设置已保存/)).toBeVisible();
+  expect(harness.invocations("set_nianlun_settings")).toEqual([
+    {
+      command: "set_nianlun_settings",
+      args: {
+        settings: {
+          baseUrl: "http://localhost:8000",
+          chatPath: "/api/agent/chat",
+          healthPath: "/api/health",
+          enableStreaming: true,
+          timeoutMs: 30_000,
+          mockMode: true,
+          saveHistory: true,
+        },
+      },
+    },
+  ]);
+  expect(harness.invocations("save_nianlun_access_token")).toEqual([
+    {
+      command: "save_nianlun_access_token",
+      args: { token: "" },
+    },
+  ]);
+});
+
 test("agent integration switch installs and uninstalls an adapter", async ({ browser }) => {
   const harness = await createAppHarness(browser, {
     adapters: [codexAdapter],

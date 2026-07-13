@@ -1115,6 +1115,7 @@ pub fn run() {
     init_builtin_dirs_from_exe();
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init());
 
     #[cfg(target_os = "macos")]

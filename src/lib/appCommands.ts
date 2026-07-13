@@ -162,7 +162,7 @@ export async function saveNianLunAccessToken(
   token: string,
 ): Promise<CommandResult> {
   try {
-    await invoke("set_nianlun_access_token", { token });
+    await invoke("save_nianlun_access_token", { token });
     return { errorMessage: null };
   } catch {
     return { errorMessage: "无法保存访问 Token 到系统安全存储" };

@@ -1,3 +1,4 @@
+import { platformFetch } from "../../platform";
 import { HttpNianLunAdapter } from "./http-adapter";
 import { MockNianLunAdapter } from "./mock-adapter";
 import { NianLunError } from "./errors";
@@ -18,7 +19,7 @@ export class NianLunClient {
   constructor(
     private readonly config: NianLunConfig,
     token = "",
-    fetchImpl: typeof fetch = fetch,
+    fetchImpl: typeof fetch = platformFetch,
   ) {
     this.http = new HttpNianLunAdapter(config, token, fetchImpl);
     this.stream = new StreamNianLunAdapter(config, token, fetchImpl);
@@ -75,7 +76,7 @@ export class NianLunClient {
 export function createNianLunClient(
   config: NianLunConfig,
   token = "",
-  fetchImpl: typeof fetch = fetch,
+  fetchImpl: typeof fetch = platformFetch,
 ): NianLunClient {
   return new NianLunClient(config, token, fetchImpl);
 }

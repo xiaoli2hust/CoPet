@@ -48,6 +48,33 @@ fn nianlun_settings_persist_without_a_token() {
 }
 
 #[test]
+fn nianlun_settings_match_frontend_names_and_accept_legacy_names() {
+    let serialized = serde_json::to_value(NianLunSettings::default()).expect("serialized settings");
+
+    assert_eq!(serialized["enableStreaming"], true);
+    assert_eq!(serialized["mockMode"], true);
+    assert_eq!(serialized["saveHistory"], true);
+    assert!(serialized.get("streamEnabled").is_none());
+    assert!(serialized.get("mockEnabled").is_none());
+    assert!(serialized.get("historyEnabled").is_none());
+
+    let legacy = serde_json::json!({
+        "baseUrl": "http://localhost:8000",
+        "chatPath": "/api/agent/chat",
+        "healthPath": "/api/health",
+        "streamEnabled": false,
+        "timeoutMs": 15_000,
+        "mockEnabled": false,
+        "historyEnabled": false
+    });
+    let settings = serde_json::from_value::<NianLunSettings>(legacy).expect("legacy settings");
+
+    assert!(!settings.stream_enabled);
+    assert!(!settings.mock_enabled);
+    assert!(!settings.history_enabled);
+}
+
+#[test]
 fn chat_position_stays_inside_a_scaled_secondary_monitor() {
     let screen = ScreenRect {
         x: -2_560.0,
