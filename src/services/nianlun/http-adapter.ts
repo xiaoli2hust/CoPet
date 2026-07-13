@@ -46,13 +46,17 @@ export class HttpNianLunAdapter implements NianLunAgentAdapter {
         message: response.ok ? "连接成功" : "健康检查返回 HTTP " + response.status,
       };
     } catch (error) {
+      const detail = redactSensitive(
+        error instanceof Error ? error.message : String(error),
+        this.token,
+      ).trim();
       return {
         ok: false,
         mode: "http",
         message:
           error instanceof DOMException && error.name === "AbortError"
             ? "连接超时"
-            : "后台离线或网络不可达",
+            : "后台离线或网络不可达" + (detail ? "：" + detail : ""),
       };
     } finally {
       globalThis.clearTimeout(timer);
