@@ -389,7 +389,7 @@ test("all previews can be imported together", async ({ browser }) => {
 test("closing the drawer is ignored while preview commit is active", async ({ browser }) => {
   const harness = await createAppHarness(browser, {
     commandDelayMs: {
-      commit_pet_import_previews: 250,
+      commit_pet_import_previews: 2_000,
     },
     importPreviews: [previewFox],
   });

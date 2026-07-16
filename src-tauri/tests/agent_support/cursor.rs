@@ -160,18 +160,20 @@ fn cursor_stale_helper_path_is_not_installed_and_install_repairs_it() {
 
     let hooks = read_json(home.join(".cursor/hooks.json"));
     let serialized = hooks.to_string();
-    assert!(serialized.contains(
-        &current_root
-            .join("hooks/copet-hook.sh")
-            .to_string_lossy()
-            .to_string()
-    ));
-    assert!(!serialized.contains(
-        &stale_root
-            .join("hooks/copet-hook.sh")
-            .to_string_lossy()
-            .to_string()
-    ));
+    let current_path = current_root
+        .join("hooks")
+        .join("copet-hook.sh")
+        .to_string_lossy()
+        .to_string();
+    let stale_path = stale_root
+        .join("hooks")
+        .join("copet-hook.sh")
+        .to_string_lossy()
+        .to_string();
+    let current_json_fragment = serde_json::to_string(&current_path).unwrap();
+    let stale_json_fragment = serde_json::to_string(&stale_path).unwrap();
+    assert!(serialized.contains(current_json_fragment.trim_matches('"')));
+    assert!(!serialized.contains(stale_json_fragment.trim_matches('"')));
 }
 
 #[test]

@@ -3,8 +3,9 @@ import ReactDOM from "react-dom/client";
 
 import { App } from "./App";
 import "./styles.css";
+import { isWindowsPlatform } from "./platform";
 
-if (/windows/i.test(navigator.userAgent)) {
+if (isWindowsPlatform) {
   document.documentElement.setAttribute("data-platform", "win");
 }
 

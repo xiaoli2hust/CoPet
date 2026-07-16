@@ -7,29 +7,9 @@ use copet_lib::{
     },
 };
 use std::{
-    env,
-    ffi::OsString,
     fs,
     path::{Path, PathBuf},
-    sync::Mutex,
 };
-
-static HOME_ENV_LOCK: Mutex<()> = Mutex::new(());
-
-struct EnvRestore {
-    key: &'static str,
-    value: Option<OsString>,
-}
-
-impl Drop for EnvRestore {
-    fn drop(&mut self) {
-        if let Some(value) = &self.value {
-            env::set_var(self.key, value);
-        } else {
-            env::remove_var(self.key);
-        }
-    }
-}
 
 fn builtin_pets_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("assets/pets")
@@ -63,22 +43,16 @@ fn create_pet_package(root: &Path, storage_id: &str, manifest_id: &str, display_
 
 #[test]
 fn preview_session_directory_is_under_copet_root() {
-    let _guard = HOME_ENV_LOCK.lock().unwrap();
     let temp = tempfile::tempdir().unwrap();
-    let home = temp.path().join("home");
-    let _restore_home = EnvRestore {
-        key: "HOME",
-        value: env::var_os("HOME"),
-    };
-    env::set_var("HOME", &home);
+    let store = make_store(&temp);
 
-    let session = copet_lib::create_pet_import_session().unwrap();
+    let session = create_import_session(&store).unwrap();
 
-    assert!(home
-        .join(".copet")
-        .join("import-previews")
+    assert!(store
+        .import_previews_dir()
         .join(session.session_id)
         .exists());
+    assert!(store.import_previews_dir().starts_with(store.root()));
 }
 
 #[test]
@@ -183,8 +157,8 @@ fn preview_folder_imports_skips_unsafe_manifest_id_without_staging() {
 fn preview_folder_imports_skips_unsafe_source_storage_id_without_staging() {
     let temp = tempfile::tempdir().unwrap();
     let store = make_store(&temp);
-    let source_dir = temp.path().join("bad:id");
-    create_pet_package(temp.path(), "bad:id", "bad-id", "Bad Source");
+    let source_dir = temp.path().join("bad+id");
+    create_pet_package(temp.path(), "bad+id", "bad-id", "Bad Source");
 
     let session = create_import_session(&store).unwrap();
     let batch = preview_folder_imports(&store, &session.session_id, &[source_dir]).unwrap();

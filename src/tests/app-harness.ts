@@ -307,6 +307,17 @@ export async function createAppHarness(browser: Browser, options: AppHarnessOpti
     petWindowSize: 40,
     agentMessageDisplay: "all",
     agentMessageVisible: true,
+    agentIntegrationsEnabled: true,
+    nianlunUserConfigured: true,
+    nianlun: {
+      baseUrl: "http://localhost:8000",
+      chatPath: "/api/agent/chat",
+      healthPath: "/api/health",
+      enableStreaming: true,
+      timeoutMs: 30_000,
+      mockMode: true,
+      saveHistory: true,
+    },
   };
   if (state.soundPacks === undefined) {
     state = { ...state, soundPacks: [copetSoundPack] };
@@ -658,6 +669,21 @@ export async function createAppHarness(browser: Browser, options: AppHarnessOpti
           await emitAppState();
           return state;
         }
+        if (command === "set_nianlun_settings") {
+          state = {
+            ...state,
+            nianlun: args.settings as AppState["nianlun"],
+            nianlunUserConfigured: true,
+          };
+          await emitAppState();
+          return state;
+        }
+        if (command === "get_nianlun_access_token") {
+          return "";
+        }
+        if (command === "save_nianlun_access_token") {
+          return null;
+        }
         if (command === "set_locale_preference") {
           const localePreference = args.localePreference as AppState["localePreference"];
           const locale = localePreference === "zh-CN" ? "zh-CN" : "en-US";
@@ -727,16 +753,20 @@ export async function createAppHarness(browser: Browser, options: AppHarnessOpti
       const listeners: Listener[] = [];
 
       window.__copetPlayedSoundUrls = [];
-      HTMLMediaElement.prototype.play = function () {
-        const rawSrc = (this as HTMLAudioElement).getAttribute("src");
-        window.__copetPlayedSoundUrls.push(
-          rawSrc || (this as HTMLAudioElement).currentSrc || (this as HTMLAudioElement).src,
-        );
-        return Promise.resolve();
-      };
-      HTMLMediaElement.prototype.pause = function () {
-        return undefined;
-      };
+      class MockAudio {
+        currentTime = 0;
+        preload = "";
+
+        constructor(readonly src: string) {}
+
+        play() {
+          window.__copetPlayedSoundUrls.push(this.src);
+          return Promise.resolve();
+        }
+
+        pause() {}
+      }
+      window.Audio = MockAudio as unknown as typeof Audio;
 
       window.__TAURI_EVENT_PLUGIN_INTERNALS__ = {
         unregisterListener: (_event: string, eventId: number) => {

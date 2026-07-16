@@ -1,0 +1,154 @@
+.nianlun-window {
+  --nl-ink: #132238;
+  --nl-muted: #637086;
+  --nl-surface: rgba(244, 247, 249, 0.94);
+  --nl-panel: rgba(255, 255, 255, 0.76);
+  --nl-line: rgba(33, 58, 82, 0.13);
+  --nl-accent: #0d6b67;
+  --nl-accent-strong: #084f4c;
+  --nl-user: #173d5e;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  min-width: 360px;
+  min-height: 420px;
+  padding: 10px;
+  color: var(--nl-ink);
+  font-family: "Avenir Next", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+  background:
+    radial-gradient(circle at 85% 4%, rgba(58, 151, 142, 0.18), transparent 34%),
+    radial-gradient(circle at 4% 96%, rgba(31, 71, 105, 0.14), transparent 40%);
+}
+
+.nianlun-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 22px;
+  background: var(--nl-surface);
+  box-shadow: 0 18px 48px rgba(16, 38, 55, 0.23), inset 0 0 0 1px var(--nl-line);
+  backdrop-filter: blur(22px) saturate(1.15);
+}
+
+.nianlun-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--nl-line);
+  user-select: none;
+}
+
+.nianlun-title-wrap,
+.nianlun-status,
+.nianlun-actions,
+.nianlun-composer-actions,
+.nianlun-message-meta {
+  display: flex;
+  align-items: center;
+}
+
+.nianlun-title-wrap { gap: 10px; }
+.nianlun-title { margin: 0; font-size: 17px; font-weight: 760; letter-spacing: 0.02em; }
+.nianlun-status { gap: 6px; color: var(--nl-muted); font-size: 12px; }
+.nianlun-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #9aa5b1; box-shadow: 0 0 0 3px rgba(154, 165, 177, 0.16); }
+.nianlun-status-dot[data-state="connected"] { background: #2f9d68; box-shadow: 0 0 0 3px rgba(47, 157, 104, 0.16); }
+.nianlun-status-dot[data-state="error"] { background: #c85849; box-shadow: 0 0 0 3px rgba(200, 88, 73, 0.16); }
+.nianlun-actions { gap: 6px; }
+
+.nianlun-icon-button,
+.nianlun-copy,
+.nianlun-secondary,
+.nianlun-primary,
+.nianlun-suggestion {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.nianlun-icon-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--nl-muted);
+  background: rgba(25, 53, 77, 0.06);
+}
+.nianlun-icon-button:hover { background: rgba(25, 53, 77, 0.12); color: var(--nl-ink); }
+
+.nianlun-messages {
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 14px 20px;
+  scroll-behavior: smooth;
+}
+
+.nianlun-empty { display: grid; place-items: center; min-height: 100%; padding: 22px 12px; text-align: center; }
+.nianlun-empty-card { max-width: 330px; }
+.nianlun-empty-mark { display: grid; place-items: center; width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 18px; color: white; font-size: 25px; font-weight: 800; background: linear-gradient(145deg, #173d5e, #0d6b67); box-shadow: 0 10px 26px rgba(13, 107, 103, 0.22); }
+.nianlun-empty h2 { margin: 0 0 7px; font-size: 18px; }
+.nianlun-empty p { margin: 0 0 16px; color: var(--nl-muted); font-size: 13px; line-height: 1.6; }
+.nianlun-suggestions { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+.nianlun-suggestion { padding: 7px 10px; border: 1px solid var(--nl-line); border-radius: 999px; color: var(--nl-ink); background: rgba(255, 255, 255, 0.7); font-size: 12px; }
+.nianlun-suggestion:hover { border-color: rgba(13, 107, 103, 0.4); color: var(--nl-accent-strong); }
+
+.nianlun-message { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 13px; }
+.nianlun-message[data-role="user"] { align-items: flex-end; }
+.nianlun-bubble { max-width: 91%; padding: 10px 12px; border: 1px solid var(--nl-line); border-radius: 15px 15px 15px 5px; background: var(--nl-panel); box-shadow: 0 4px 14px rgba(29, 48, 64, 0.05); overflow: hidden; }
+.nianlun-message[data-role="user"] .nianlun-bubble { color: white; border-color: transparent; border-radius: 15px 15px 5px 15px; background: var(--nl-user); }
+.nianlun-message-meta { justify-content: space-between; gap: 12px; width: min(91%, 100%); margin-top: 4px; color: var(--nl-muted); font-size: 10px; }
+.nianlun-copy { padding: 2px 5px; color: inherit; background: transparent; font-size: 10px; }
+.nianlun-copy:hover { color: var(--nl-accent); }
+
+.nianlun-markdown { min-width: 0; overflow-wrap: anywhere; font-size: 13px; line-height: 1.62; }
+.nianlun-markdown > :first-child { margin-top: 0; }
+.nianlun-markdown > :last-child { margin-bottom: 0; }
+.nianlun-markdown p, .nianlun-markdown ul, .nianlun-markdown ol, .nianlun-markdown blockquote { margin: 0.5em 0; }
+.nianlun-markdown pre, .nianlun-markdown .table-scroll { max-width: 100%; overflow: auto; }
+.nianlun-markdown pre { padding: 10px; border-radius: 10px; color: #e7edf2; background: #172431; }
+.nianlun-markdown code { padding: 0.12em 0.35em; border-radius: 4px; background: rgba(31, 65, 91, 0.1); font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.9em; }
+.nianlun-markdown pre code { padding: 0; background: transparent; }
+.nianlun-markdown table { min-width: 100%; border-collapse: collapse; font-size: 12px; }
+.nianlun-markdown th, .nianlun-markdown td { padding: 6px 8px; border: 1px solid var(--nl-line); text-align: left; white-space: nowrap; }
+.nianlun-markdown a { color: var(--nl-accent); }
+
+.nianlun-evidence { margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--nl-line); }
+.nianlun-evidence-title { margin-bottom: 5px; color: var(--nl-muted); font-size: 11px; font-weight: 700; }
+.nianlun-evidence-item { margin-top: 3px; font-size: 11px; line-height: 1.45; }
+.nianlun-process { display: flex; align-items: center; gap: 8px; margin: 2px 0 11px; color: var(--nl-muted); font-size: 12px; }
+.nianlun-spinner { width: 13px; height: 13px; border: 2px solid rgba(13, 107, 103, 0.18); border-top-color: var(--nl-accent); border-radius: 50%; animation: nianlun-spin 0.8s linear infinite; }
+@keyframes nianlun-spin { to { transform: rotate(360deg); } }
+
+.nianlun-error { margin: 0 14px 8px; padding: 8px 10px; border: 1px solid rgba(183, 67, 52, 0.22); border-radius: 10px; color: #923d32; background: rgba(255, 231, 226, 0.9); font-size: 12px; }
+.nianlun-composer { padding: 10px 12px 12px; border-top: 1px solid var(--nl-line); background: rgba(236, 241, 244, 0.82); }
+.nianlun-composer textarea { box-sizing: border-box; width: 100%; max-height: 116px; min-height: 62px; resize: none; padding: 9px 10px; border: 1px solid rgba(36, 61, 82, 0.18); border-radius: 12px; outline: none; color: var(--nl-ink); background: rgba(255, 255, 255, 0.78); font: inherit; font-size: 13px; line-height: 1.45; }
+.nianlun-composer textarea:focus { border-color: rgba(13, 107, 103, 0.5); box-shadow: 0 0 0 3px rgba(13, 107, 103, 0.08); }
+.nianlun-composer-actions { justify-content: space-between; gap: 8px; margin-top: 8px; }
+.nianlun-composer-hint { color: var(--nl-muted); font-size: 10px; }
+.nianlun-button-group { display: flex; gap: 7px; }
+.nianlun-primary, .nianlun-secondary { padding: 7px 12px; border-radius: 9px; font-weight: 700; font-size: 12px; }
+.nianlun-primary { color: white; background: var(--nl-accent); }
+.nianlun-primary:hover { background: var(--nl-accent-strong); }
+.nianlun-secondary { color: var(--nl-ink); background: rgba(30, 59, 82, 0.09); }
+.nianlun-primary:disabled, .nianlun-secondary:disabled { cursor: default; opacity: 0.45; }
+
+.nianlun-settings-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.nianlun-settings-grid .field-span { grid-column: 1 / -1; }
+.nianlun-security-note { padding: 11px 12px; border-left: 3px solid #be7d2d; border-radius: 8px; color: #6e4b21; background: rgba(244, 220, 179, 0.35); font-size: 12px; line-height: 1.55; }
+.nianlun-settings-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+@media (max-width: 430px) {
+  .nianlun-window { padding: 5px; min-width: 320px; }
+  .nianlun-shell { border-radius: 17px; }
+  .nianlun-settings-grid { grid-template-columns: 1fr; }
+  .nianlun-settings-grid .field-span { grid-column: auto; }
+  .nianlun-composer-hint { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nianlun-messages { scroll-behavior: auto; }
+  .nianlun-spinner { animation-duration: 1.6s; }
+}

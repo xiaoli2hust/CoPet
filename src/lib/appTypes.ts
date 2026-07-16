@@ -1,3 +1,5 @@
+import type { NianLunConfig } from "../services/nianlun/types";
+
 export type PetStateId =
   | "idle"
   | "running-right"
@@ -92,7 +94,18 @@ export type AppState = {
   agentMessageDisplay: AgentMessageDisplay;
   agentMessageVisible: boolean;
   petInteractions: PetInteractionPrefs;
+  nianlun: NianLunConfig;
+  nianlunUserConfigured: boolean;
+  agentIntegrationsEnabled: boolean;
 };
+
+export type NianLunPetStatus =
+  | "idle"
+  | "listening"
+  | "thinking"
+  | "working"
+  | "success"
+  | "error";
 
 export type PetWindowSize = number;
 

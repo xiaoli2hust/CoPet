@@ -2,7 +2,12 @@ import type { LucideIcon } from "lucide-react";
 
 import type { createTranslator } from "../lib/i18n";
 
-export type SettingsSectionId = "pets" | "agents" | "preferences" | "about";
+export type SettingsSectionId =
+  | "pets"
+  | "agents"
+  | "nianlun"
+  | "preferences"
+  | "about";
 
 export interface SettingsNavItem {
   id: SettingsSectionId;
@@ -13,6 +18,7 @@ export interface SettingsNavItem {
 export type SettingsNavLabelKey =
   | "navPets"
   | "navAgents"
+  | "navNianLun"
   | "navPreferences"
   | "navAbout";
 

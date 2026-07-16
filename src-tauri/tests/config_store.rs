@@ -639,15 +639,15 @@ fn install_codex_pet_rejects_unsafe_source_storage_id_without_writing() {
     let temp = tempfile::tempdir().unwrap();
     let store = make_store(&temp);
     let codex_pets = temp.path().join(".codex/pets");
-    create_pet_package(&codex_pets.join("bad:id"), "desk-cat", "Desk Cat");
+    create_pet_package(&codex_pets.join("bad+id"), "desk-cat", "Desk Cat");
     store.ensure_ready().unwrap();
 
     let error = store
-        .install_codex_pet(&codex_pets, "user:bad:id")
+        .install_codex_pet(&codex_pets, "user:bad+id")
         .unwrap_err();
 
     assert!(error.to_string().contains("safe storage id"));
-    assert!(!store.root().join("pets/bad:id").exists());
+    assert!(!store.root().join("pets/bad+id").exists());
     assert!(!store.root().join("pets/desk-cat").exists());
 }
 

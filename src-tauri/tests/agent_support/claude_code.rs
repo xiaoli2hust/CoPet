@@ -72,6 +72,7 @@ fn claude_inspect_ignores_copet_text_outside_hook_commands() {
     assert!(!summary.installed);
 }
 
+#[cfg_attr(windows, ignore = "requires Unix shell helper execution")]
 #[test]
 fn claude_helper_ignores_cursor_compatibility_hook_payloads() {
     let temp = tempfile::tempdir().unwrap();

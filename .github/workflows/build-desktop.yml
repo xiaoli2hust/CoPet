@@ -1,0 +1,91 @@
+name: Build desktop
+
+on:
+  push:
+    branches: [main, "codex/**", "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: "true"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS universal
+            os: macos-14
+            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
+            tauri-target: universal-apple-darwin
+            bundles: dmg
+            artifact-name: nianlun-desktop-pet-macos
+            artifact-path: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+          - name: Windows x64
+            os: windows-latest
+            rust-targets: x86_64-pc-windows-msvc
+            tauri-target: x86_64-pc-windows-msvc
+            bundles: nsis
+            artifact-name: nianlun-desktop-pet-windows-x64
+            artifact-path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install chromium
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: ESLint
+        run: pnpm lint
+
+      - name: Frontend tests
+        run: pnpm test:frontend
+
+      - name: Rust fmt
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+
+      - name: Rust clippy
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+
+      - name: Rust tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Tauri production build
+        run: pnpm tauri:build --target ${{ matrix.tauri-target }} --bundles ${{ matrix.bundles }}
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-path }}
+          if-no-files-found: error
+          retention-days: 14

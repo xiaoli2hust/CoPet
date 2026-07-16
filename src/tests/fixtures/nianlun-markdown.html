@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>NianLun Markdown Security Harness</title>
+  </head>
+  <body>
+    <main id="root"></main>
+    <script type="module">
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import * as markdownModule from "../../components/NianLunMarkdown.tsx";
+
+      const Markdown = markdownModule.NianLunMarkdown ?? markdownModule.default;
+      const content = new URLSearchParams(window.location.search).get("content") ?? "";
+      createRoot(document.getElementById("root")).render(React.createElement(Markdown, { content }));
+    </script>
+  </body>
+</html>

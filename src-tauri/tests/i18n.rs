@@ -48,10 +48,13 @@ fn defaults_to_english_for_unknown_environment() {
 
 #[test]
 fn localizes_tray_menu_labels() {
-    // Unchanged keys
-    assert_eq!(t(Locale::EnUs, MessageKey::TrayBrand), "CoPet");
+    // Product keys
+    assert_eq!(
+        t(Locale::EnUs, MessageKey::TrayBrand),
+        "NianLun Desktop Pet"
+    );
     assert_eq!(t(Locale::EnUs, MessageKey::TrayQuit), "Quit");
-    assert_eq!(t(Locale::ZhCn, MessageKey::TrayBrand), "CoPet");
+    assert_eq!(t(Locale::ZhCn, MessageKey::TrayBrand), "年轮经营桌宠");
     assert_eq!(t(Locale::ZhCn, MessageKey::TrayQuit), "退出应用");
 
     // Settings sub-tab labels (each opens the settings window on that tab)
@@ -98,14 +101,25 @@ fn localizes_tray_menu_labels() {
 #[test]
 fn localizes_app_menu_labels() {
     // The macOS app menu (top-left of the screen) needs every label that
-    // embeds the app name to use the capitalized "CoPet" — the binary
-    // name fallback is lowercase and unacceptable in either locale.
-    assert_eq!(t(Locale::EnUs, MessageKey::AppMenuAbout), "About CoPet");
-    assert_eq!(t(Locale::EnUs, MessageKey::AppMenuHide), "Hide CoPet");
-    assert_eq!(t(Locale::EnUs, MessageKey::AppMenuQuit), "Quit CoPet");
-    assert_eq!(t(Locale::ZhCn, MessageKey::AppMenuAbout), "关于 CoPet");
-    assert_eq!(t(Locale::ZhCn, MessageKey::AppMenuHide), "隐藏 CoPet");
-    assert_eq!(t(Locale::ZhCn, MessageKey::AppMenuQuit), "退出 CoPet");
+    // embeds the localized product name instead of falling back to a binary name.
+    assert_eq!(
+        t(Locale::EnUs, MessageKey::AppMenuAbout),
+        "About NianLun Desktop Pet"
+    );
+    assert_eq!(
+        t(Locale::EnUs, MessageKey::AppMenuHide),
+        "Hide NianLun Desktop Pet"
+    );
+    assert_eq!(
+        t(Locale::EnUs, MessageKey::AppMenuQuit),
+        "Quit NianLun Desktop Pet"
+    );
+    assert_eq!(
+        t(Locale::ZhCn, MessageKey::AppMenuAbout),
+        "关于年轮经营桌宠"
+    );
+    assert_eq!(t(Locale::ZhCn, MessageKey::AppMenuHide), "隐藏年轮经营桌宠");
+    assert_eq!(t(Locale::ZhCn, MessageKey::AppMenuQuit), "退出年轮经营桌宠");
 
     assert_eq!(t(Locale::EnUs, MessageKey::AppMenuServices), "Services");
     assert_eq!(

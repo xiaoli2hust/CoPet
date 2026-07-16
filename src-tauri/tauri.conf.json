@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "CoPet",
+  "productName": "NianLun Desktop Pet",
   "version": "0.1.11",
-  "identifier": "run.copet.desktop",
+  "identifier": "com.nianlun.desktop-pet",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -14,7 +14,7 @@
     "windows": [
       {
         "label": "pet",
-        "title": "CoPet",
+        "title": "年轮经营桌宠",
         "width": 164,
         "height": 189,
         "resizable": false,
@@ -32,8 +32,30 @@
         "visibleOnAllWorkspaces": true
       },
       {
+        "label": "nianlun",
+        "title": "问年轮",
+        "width": 420,
+        "height": 560,
+        "minWidth": 360,
+        "minHeight": 420,
+        "resizable": true,
+        "fullscreen": false,
+        "transparent": true,
+        "backgroundColor": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "decorations": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "visibleOnAllWorkspaces": true
+      },
+      {
         "label": "settings",
-        "title": "CoPet",
+        "title": "年轮经营桌宠",
         "width": 770,
         "height": 760,
         "minWidth": 560,
@@ -55,6 +77,9 @@
           "$HOME/.copet/sounds/**",
           "$HOME/.copet/import-previews/**",
           "$HOME/.codex/pets/**",
+          "$APPDATA/NianLun Desktop Pet/pets/**",
+          "$APPDATA/NianLun Desktop Pet/sounds/**",
+          "$APPDATA/NianLun Desktop Pet/import-previews/**",
           "$RESOURCE/assets/pets/**",
           "$RESOURCE/assets/sounds/**"
         ]

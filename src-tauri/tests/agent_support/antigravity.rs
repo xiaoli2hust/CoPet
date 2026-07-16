@@ -19,7 +19,7 @@ fn antigravity_install_writes_global_hooks_entry() {
     let manager = manager_with_fake_agents(&root, &home);
 
     let result = manager.install("antigravity").unwrap();
-    let hooks = read_json(home.join(".gemini/config/hooks.json"));
+    let hooks = read_json(home.join(".gemini").join("config").join("hooks.json"));
     let copet = &hooks["copet-antigravity"];
 
     assert!(result.adapter.installed);
@@ -27,7 +27,11 @@ fn antigravity_install_writes_global_hooks_entry() {
     assert_eq!(result.adapter.display_name, "Antigravity");
     assert_eq!(
         result.adapter.config_path,
-        home.join(".gemini/config/hooks.json").display().to_string()
+        home.join(".gemini")
+            .join("config")
+            .join("hooks.json")
+            .display()
+            .to_string()
     );
     assert!(copet["PreToolUse"][0]["matcher"].as_str().unwrap() == "*");
     assert!(copet["PostToolUse"][0]["matcher"].as_str().unwrap() == "*");
@@ -456,6 +460,7 @@ fn antigravity_stop_command_allows_stop_when_helper_is_missing() {
     );
 }
 
+#[cfg_attr(windows, ignore = "requires Unix shell helper execution")]
 #[test]
 fn antigravity_helper_extracts_tool_call_details_from_official_payload() {
     let _guard = PROXY_ENV_LOCK.lock().unwrap();
@@ -565,6 +570,7 @@ fn antigravity_helper_extracts_tool_call_details_from_official_payload() {
     ));
 }
 
+#[cfg_attr(windows, ignore = "requires Unix shell helper execution")]
 #[test]
 fn antigravity_helper_omits_empty_tool_name_from_payload() {
     let _guard = PROXY_ENV_LOCK.lock().unwrap();
@@ -678,6 +684,7 @@ fn antigravity_pre_tool_command_allows_tool_when_helper_is_missing() {
     );
 }
 
+#[cfg_attr(windows, ignore = "requires Unix shell helper execution")]
 #[test]
 fn antigravity_helper_allows_stop_when_runtime_is_unavailable() {
     let temp = tempfile::tempdir().unwrap();

@@ -8,13 +8,17 @@ pub mod pet_context_menu;
 pub mod pet_import;
 pub mod pet_package;
 pub mod pet_registry;
+pub mod platform;
 pub mod runtime_server;
 pub mod runtime_state;
 pub mod sound_pack;
 pub mod window_placement;
 
 use agents::{AdapterError, AdapterOperationResult, AdapterSummary, AgentManager};
-use app_state::{AgentMessageDisplay, AppState, PetInteractionPrefs, PetWindowSize};
+use app_state::{
+    AgentMessageDisplay, AppState, NianLunPetStatus, NianLunSettings, PetInteractionPrefs,
+    PetWindowSize,
+};
 use config_store::{set_builtin_pets_dir, set_builtin_sounds_dir, ConfigStore, PetImportResult};
 use i18n::{default_locale, t, Locale, LocalePreference, MessageKey};
 use pet_import::{PetImportCommitResult, PetImportPreviewBatch, PetImportSession};
@@ -86,6 +90,7 @@ fn init_builtin_dirs_from_exe() {
 }
 
 const TRAY_MENU_BRAND_HEADER_ID: &str = "brand-header";
+const TRAY_MENU_NIANLUN_ID: &str = "ask-nianlun";
 const TRAY_MENU_VISIBILITY_ID: &str = "toggle-visibility";
 const TRAY_MENU_MESSAGES_ID: &str = "toggle-messages";
 const TRAY_MENU_RESET_POSITION_ID: &str = "reset-pet-position";
@@ -113,6 +118,7 @@ const SETTINGS_NAVIGATE_PAINT_DELAY: Duration = Duration::from_millis(20);
 
 struct TrayMenuHandles {
     brand: MenuItem<Wry>,
+    nianlun: MenuItem<Wry>,
     visibility: MenuItem<Wry>,
     messages: MenuItem<Wry>,
     reset_position: MenuItem<Wry>,
@@ -233,7 +239,7 @@ fn set_locale_preference(
 fn install_app_menu<M: Manager<Wry>>(manager: &M, locale: Locale) -> tauri::Result<()> {
     use tauri::menu::AboutMetadata;
 
-    let app_name = "CoPet";
+    let app_name = "NianLun Desktop Pet";
     let about_metadata = AboutMetadata {
         name: Some(app_name.to_string()),
         version: Some(env!("CARGO_PKG_VERSION").to_string()),
@@ -316,6 +322,7 @@ pub fn refresh_tray_menu(app: &AppHandle, state: &AppState) {
         t(locale, MessageKey::TrayBrand),
         env!("CARGO_PKG_VERSION")
     ));
+    let _ = handles.nianlun.set_text("问年轮");
     let _ = handles.visibility.set_text(t(
         locale,
         if pet_visible {
@@ -628,7 +635,7 @@ fn get_runtime_status(app: tauri::AppHandle) -> RuntimeSnapshot {
 }
 
 fn emit_app_state_changed(app: &tauri::AppHandle, state: &AppState) -> Result<(), String> {
-    for label in ["pet", "settings"] {
+    for label in ["pet", "settings", "nianlun"] {
         app.emit_to(
             EventTarget::webview_window(label),
             APP_STATE_CHANGED_EVENT,
@@ -751,6 +758,77 @@ async fn open_settings_window(app: tauri::AppHandle) -> Result<(), String> {
     show_settings_window(&app)
 }
 
+#[tauri::command]
+async fn open_settings_section(app: tauri::AppHandle, section: String) -> Result<(), String> {
+    show_settings_window_with_initial_section(&app, Some(section.as_str()))
+}
+
+fn show_nianlun_window(app: &tauri::AppHandle) -> Result<(), String> {
+    let window = app
+        .get_webview_window("nianlun")
+        .ok_or_else(|| "NianLun window is unavailable".to_string())?;
+    platform::window::clamp_chat_near_pet(app, &window)?;
+    window.show().map_err(|error| error.to_string())?;
+    window.set_focus().map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn open_nianlun_window(app: tauri::AppHandle) -> Result<(), String> {
+    show_nianlun_window(&app)
+}
+
+#[tauri::command]
+fn set_nianlun_settings(
+    app: tauri::AppHandle,
+    settings: NianLunSettings,
+) -> Result<AppState, String> {
+    let state = ConfigStore::from_home()
+        .and_then(|store| store.set_nianlun_settings(settings))
+        .map_err(localize_store_error)?;
+    emit_app_state_changed(&app, &state)?;
+    Ok(state)
+}
+
+#[tauri::command]
+fn get_nianlun_token() -> Result<Option<String>, String> {
+    platform::credentials::read_token()
+}
+
+#[tauri::command]
+fn save_nianlun_token(token: String) -> Result<(), String> {
+    platform::credentials::save_token(&token)
+}
+
+#[tauri::command]
+fn get_nianlun_access_token() -> Result<Option<String>, String> {
+    get_nianlun_token()
+}
+
+#[tauri::command]
+fn save_nianlun_access_token(token: String) -> Result<(), String> {
+    save_nianlun_token(token)
+}
+
+#[tauri::command]
+fn set_nianlun_pet_status(app: tauri::AppHandle, status: NianLunPetStatus) -> Result<(), String> {
+    app.emit_to(
+        EventTarget::webview_window("pet"),
+        "nianlun-pet-status",
+        status,
+    )
+    .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn quit_application(app: tauri::AppHandle) {
+    platform::lifecycle::quit(&app);
+}
+
+#[tauri::command]
+fn quit_app(app: tauri::AppHandle) {
+    platform::lifecycle::quit(&app);
+}
+
 fn install_tray_menu(app: &mut tauri::App, locale: Locale) -> tauri::Result<()> {
     let brand_text = format!(
         "{} · v{}",
@@ -765,6 +843,7 @@ fn install_tray_menu(app: &mut tauri::App, locale: Locale) -> tauri::Result<()> 
         false,
         None::<&str>,
     )?;
+    let nianlun = MenuItem::with_id(app, TRAY_MENU_NIANLUN_ID, "问年轮", true, None::<&str>)?;
     let visibility = MenuItem::with_id(
         app,
         TRAY_MENU_VISIBILITY_ID,
@@ -855,12 +934,11 @@ fn install_tray_menu(app: &mut tauri::App, locale: Locale) -> tauri::Result<()> 
         &[
             &brand,
             &separator_after_brand,
+            &nianlun,
             &visibility,
-            &messages,
             &reset_position,
             &separator_after_reset,
             &pets,
-            &agents,
             &preferences,
             &about,
             &separator_after_settings,
@@ -871,14 +949,17 @@ fn install_tray_menu(app: &mut tauri::App, locale: Locale) -> tauri::Result<()> 
     )?;
 
     let tray_icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray.png"))?;
-    let tray = TrayIconBuilder::with_id("copet")
-        .tooltip("CoPet")
+    let tray = TrayIconBuilder::with_id("nianlun-desktop-pet")
+        .tooltip("年轮经营桌宠")
         .icon(tray_icon)
         .icon_as_template(true)
         .menu(&menu)
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| match event.id().as_ref() {
             TRAY_MENU_BRAND_HEADER_ID => { /* disabled, never fires */ }
+            TRAY_MENU_NIANLUN_ID => {
+                let _ = show_nianlun_window(app);
+            }
             TRAY_MENU_VISIBILITY_ID => {
                 let _ = handle_toggle_visibility(app);
             }
@@ -922,6 +1003,7 @@ fn install_tray_menu(app: &mut tauri::App, locale: Locale) -> tauri::Result<()> 
     app.manage::<TrayIcon>(tray);
     app.manage::<TrayMenuHandles>(TrayMenuHandles {
         brand,
+        nianlun,
         visibility,
         messages,
         reset_position,
@@ -997,6 +1079,7 @@ fn install_agent_adapter(adapter_id: String) -> Result<AdapterOperationResult, S
         .and_then(|manager| manager.install(&adapter_id))
         .map_err(localize_adapter_error)?;
     let _ = store.set_onboarding_complete(true);
+    let _ = store.set_agent_integrations_enabled(true);
     Ok(result)
 }
 
@@ -1022,6 +1105,7 @@ fn repair_agent_adapter(adapter_id: String) -> Result<AdapterOperationResult, St
         .and_then(|manager| manager.repair(&adapter_id))
         .map_err(localize_adapter_error)?;
     let _ = store.set_onboarding_complete(true);
+    let _ = store.set_agent_integrations_enabled(true);
     Ok(result)
 }
 
@@ -1033,14 +1117,13 @@ pub fn run() {
     // pets — the pet sprite never renders, the startup animation never triggers,
     // and the window ends up as a tiny sliver.
     init_builtin_dirs_from_exe();
-    let mut builder = tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init());
 
     #[cfg(target_os = "macos")]
-    {
-        builder = builder.plugin(tauri_nspanel::init());
-    }
+    let builder = builder.plugin(tauri_nspanel::init());
 
     builder
         .setup(|app| {
@@ -1055,8 +1138,10 @@ pub fn run() {
             // it for window sizing, menus, and the initial frontend event so
             // startup does not enumerate every pet and sound pack again.
             let startup_app_state = store.ensure_ready()?;
-            let manager = AgentManager::from_home(store.root())?;
-            let _ = run_agent_auto_install_once(&store, &manager)?;
+            if startup_app_state.agent_integrations_enabled {
+                let manager = AgentManager::from_home(store.root())?;
+                let _ = run_agent_auto_install_once(&store, &manager)?;
+            }
             install_tray_menu(app, startup_app_state.locale)?;
             install_app_menu(app, startup_app_state.locale)?;
             let handle = app.handle().clone();
@@ -1100,6 +1185,10 @@ pub fn run() {
                         let _ = window.destroy();
                         schedule_pet_window_z_order_reassertions(window.app_handle());
                     }
+                    "nianlun" => {
+                        api.prevent_close();
+                        let _ = window.hide();
+                    }
                     "pet" => {
                         // Same rationale as the tray quit handler; see comment
                         // there. cleanup_before_exit is intentionally omitted.
@@ -1118,6 +1207,16 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             get_app_state,
+            open_nianlun_window,
+            open_settings_section,
+            set_nianlun_settings,
+            get_nianlun_token,
+            save_nianlun_token,
+            get_nianlun_access_token,
+            save_nianlun_access_token,
+            set_nianlun_pet_status,
+            quit_application,
+            quit_app,
             select_pet,
             select_sound_pack,
             set_pet_window_size,
@@ -1152,7 +1251,7 @@ pub fn run() {
             commands::run_pet_startup_window_animation
         ])
         .build(tauri::generate_context!())
-        .expect("failed to build CoPet")
+        .expect("failed to build NianLun Desktop Pet")
         .run(|app, event| match event {
             #[cfg(target_os = "macos")]
             tauri::RunEvent::Reopen { .. } => {

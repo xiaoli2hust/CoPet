@@ -432,9 +432,13 @@ test("right-click opens the native pet context menu command", async ({ browser }
   });
   const args = harness.invocations("open_pet_context_menu")[0].args;
   expect(args?.labels).toEqual({
+    askNianLun: "Ask NianLun",
+    openChat: "Open Q&A",
     messages: "Hide Messages",
     openSettings: "Open Settings",
+    changePet: "Change Pet",
     hidePet: "Hide Pet",
+    quit: "Quit",
   });
   expect(args?.position).toEqual({
     x: expect.any(Number),

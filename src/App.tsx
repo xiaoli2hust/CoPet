@@ -3,6 +3,7 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useBootstrapAppStore } from "./hooks/useAppStore";
 import { PetWindow } from "./PetWindow";
 import { SettingsWindow } from "./SettingsWindow";
+import { NianLunWindow } from "./NianLunWindow";
 
 export function App() {
   useBootstrapAppStore();
@@ -10,6 +11,9 @@ export function App() {
 
   if (label === "settings") {
     return <SettingsWindow />;
+  }
+  if (label === "nianlun") {
+    return <NianLunWindow />;
   }
 
   return <PetWindow />;

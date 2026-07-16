@@ -1,5 +1,4 @@
 import { listen } from "@tauri-apps/api/event";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { X } from "lucide-react";
 import type {
   CSSProperties,
@@ -13,6 +12,7 @@ import { ErrorView, LoadingView } from "./components/AppShell";
 import { PetSprite } from "./components/PetSprite";
 import { Toaster } from "./components/ui/sonner";
 import { useLayeredPetState } from "./hooks/useLayeredPetState";
+import { useNianLunPetState } from "./hooks/useNianLunPetState";
 import { usePetStartupAnimation } from "./hooks/usePetStartupAnimation";
 import {
   useAgentMessages,
@@ -27,7 +27,10 @@ import {
 } from "./hooks/useAppStore";
 import {
   dismissAgentMessage,
+  openNianLunWindow,
+  openSettingsSection,
   openSettingsWindow,
+  quitApp,
   reloadAppStore,
   setAgentMessageVisible as setAgentMessageVisibleCommand,
   setPetVisible as setPetVisibleCommand,
@@ -95,8 +98,12 @@ export function PetWindow() {
   const openPetContextMenuRef = useRef<() => void>(() => undefined);
   const { composed, bindInput, bindMotion, notifyFailed } = useLayeredPetState({
     onLongPress: isMac ? () => openPetContextMenuRef.current() : undefined,
+    onDoubleClick: () => {
+      void runContextMenuCommand(openNianLunWindow());
+    },
     onInteractionSound: playInteractionSound,
   });
+  const nianlunComposed = useNianLunPetState();
   const startup = usePetStartupAnimation({
     enabled: petInteractions.enableStartupAnimation,
     selectedPetId: selectedPet?.id ?? null,
@@ -105,7 +112,8 @@ export function PetWindow() {
     onAgentSound: playAgentSound,
   });
   const displayedAgentMessages = startup.hideMessages ? [] : agentMessages;
-  const displayedComposed = startup.composedOverride ?? composed;
+  const displayedComposed =
+    startup.composedOverride ?? nianlunComposed ?? composed;
 
   const stackRef = useRef<HTMLDivElement | null>(null);
   const sliderDraggingRef = useRef(false);
@@ -135,21 +143,29 @@ export function PetWindow() {
 
   const { openMenu: openPetContextMenu } = usePetContextMenu({
     labels: {
+      askNianLun: t("contextMenuAskNianLun"),
+      openChat: t("contextMenuOpenChat"),
       messages: agentMessageVisible
         ? t("contextMenuHideMessages")
         : t("contextMenuShowMessages"),
       openSettings: t("contextMenuOpenSettings"),
+      changePet: t("contextMenuChangePet"),
       hidePet: t("contextMenuHidePet"),
+      quit: t("contextMenuQuit"),
     },
+    onAskNianLun: () => runContextMenuCommand(openNianLunWindow()),
+    onOpenChat: () => runContextMenuCommand(openNianLunWindow()),
     onToggleMessages: () => {
       void setAgentMessageVisible(!agentMessageVisible);
     },
     onOpenSettings: () => {
       void runContextMenuCommand(openSettingsWindow());
     },
+    onChangePet: () => runContextMenuCommand(openSettingsSection("pets")),
     onHidePet: () => {
       void runContextMenuCommand(setPetVisibleCommand(false));
     },
+    onQuit: () => runContextMenuCommand(quitApp()),
     onPopupFailed: notifyFailed,
   });
   const configuredPetScale = petWindowScaleFromSize(petWindowSize);

@@ -700,12 +700,12 @@ fn executable_candidates(name: &str) -> Vec<String> {
         let extensions = env::var_os("PATHEXT")
             .and_then(|value| value.into_string().ok())
             .unwrap_or_else(|| ".COM;.EXE;.BAT;.CMD".to_string());
-        return extensions
+        extensions
             .split(';')
             .filter(|extension| !extension.is_empty())
             .map(|extension| format!("{name}{extension}"))
             .chain(std::iter::once(name.to_string()))
-            .collect();
+            .collect()
     }
 
     #[cfg(not(windows))]
